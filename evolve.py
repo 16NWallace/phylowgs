@@ -26,7 +26,7 @@ from datetime import datetime
 # num_samples: number of MCMC samples
 # mh_itr: number of metropolis-hasting iterations
 # rand_seed: random seed (initialization). Set to None to choose random seed automatically.
-def start_new_run(state_manager, backup_manager, safe_to_exit, run_succeeded, config, ssm_file, cnv_file, top_k_trees_file, clonal_freqs_file, burnin_samples, num_samples, mh_itr, mh_std, write_state_every, write_backups_every, rand_seed, tmp_dir):
+def start_new_run(state_manager, backup_manager, safe_to_exit, run_succeeded, config, ssm_file, cnv_file, top_k_trees_file, clonal_freqs_file, burnin_samples, num_samples, mh_itr, mh_std, write_state_every, write_backups_every, rand_seed, tmp_dir, neg_binom=False):
 	state = {}
 
 	with open('random_seed.txt', 'w') as seedf:
@@ -77,7 +77,7 @@ def start_new_run(state_manager, backup_manager, safe_to_exit, run_succeeded, co
 	state['working_directory'] = os.getcwd()
 
 	root = alleles(conc=0.1, ntps=NTPS)
-	state['tssb'] = TSSB(dp_alpha=state['dp_alpha'], dp_gamma=state['dp_gamma'], alpha_decay=state['alpha_decay'], root_node=root, data=codes)
+	state['tssb'] = TSSB(dp_alpha=state['dp_alpha'], dp_gamma=state['dp_gamma'], alpha_decay=state['alpha_decay'], root_node=root, data=codes, neg_binom=neg_binom)
 	# hack...
 	if 1:
 		depth=0
@@ -279,7 +279,9 @@ def parse_args():
 	parser.add_argument('ssm_file',
 		help='File listing SSMs (simple somatic mutations, i.e., single nucleotide variants. For proper format, see README.md.')
 	parser.add_argument('cnv_file',
-		help='File listing CNVs (copy number variations). For proper format, see README.md.')
+		help='File listing CNVs (copy number variations). For proper format, see README.md.'),
+	#Added flag for whether or not to use neg binomial
+	parser.add_argument('-n','--neg-binom', dest='neg_binom', action='store_true', default=False)
 	args = parser.parse_args()
 	return args
 
@@ -319,7 +321,8 @@ def run(safe_to_exit, run_succeeded, config):
 			write_state_every=args.write_state_every,
 			write_backups_every=args.write_backups_every,
 			rand_seed=args.random_seed,
-			tmp_dir=args.tmp_dir
+			tmp_dir=args.tmp_dir,
+			neg_binom=args.neg_binom
 		)
 
 def remove_tmp_files(tmp_dir):

@@ -16,7 +16,7 @@ class TSSB(object):
     max_alpha_decay = 0.80
     
     def __init__(self, dp_alpha=1.0, dp_gamma=1.0, root_node=None, data=None,
-                 min_depth=0, max_depth=15, alpha_decay=1.0):
+                 min_depth=0, max_depth=15, alpha_decay=1.0, neg_binom=False):
         if root_node is None:
             raise Exception("Root node must be specified.")
         
@@ -32,6 +32,7 @@ class TSSB(object):
                              'sticks'   : empty((0,1)),
                              'children' : [] }
         root_node.tssb = self
+        self.neg_binom = neg_binom
 
         if False:
             data_u           = rand(self.num_data)

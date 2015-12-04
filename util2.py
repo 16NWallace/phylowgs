@@ -8,7 +8,8 @@ import scipy.stats as stat
 from scipy.stats import beta, binom
 from scipy.special import gammaln
 from math import exp, log
-
+from data import Datum
+from tssb import *
 import csv
 # Allow long lines in .cnv files, which can potentially list thousands of SSMs
 # in one CNV. According to http://stackoverflow.com/a/15063941, this value can
@@ -16,9 +17,9 @@ import csv
 # value, which is a signed 32-bit int.
 csv.field_size_limit(2147483647)
 
-from data import Datum
-
-from tssb import *
+#Percent of standard dev in which to test R
+NB_FRAC = 0.005 #determined based on average standard dev's seen in ssm_data.txt on order of 10^4
+NB_INCR = 10 #test range [d-NB_FRAC*sd:d+NB_FRAC*SD:NB_INCR]
 
 def log_factorial(n):
 	return gammaln(n + 1)
@@ -28,6 +29,22 @@ def log_bin_coeff(n, k):
 
 def log_binomial_likelihood(x, n, mu):
 	return x * log(mu) + (n - x) * log(1 - mu)
+
+##NEW FUNCTIONS
+#Signature added to handle optional stdev param for neg binom
+def log_binomial_likelihood2(x, n, mu, sd=0):
+	return x * log(mu) + (n - x) * log(1 - mu)
+
+#Allowing for greater variability using a negative binomial model - compute the average log likelihood
+#over r's greater than or less than d, the total number of reads for a certain range
+def log_neg_binom_likelihood(k, r, mu, sd=0):
+	minR = r - int(NB_FRAC*sd)
+	maxR = r + int(NB_FRAC*sd)
+	avgSum=0
+	for r_val in xrange(minR, maxR, NB_INCR):
+		avgSum += k * log(mu) + r_val * log(1 - mu)
+	avgLikelihood = float(avgSum)/(maxR-minR)
+	return avgLikelihood
 
 def log_beta(a, b):
 	return gammaln(a) + gammaln(b) - gammaln(a + b)

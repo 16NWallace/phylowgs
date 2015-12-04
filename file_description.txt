@@ -1,0 +1,44 @@
+1. parser/parse_cnvs.py: Translates specific CNV callers' output into
+a neutral format containing just the information we require for
+PhyloWGS. We cluster these CNV calls themselves amongst the subclonal
+lineages we establish, and use them to correct for the effect of CNVs
+on observed variant allele frequencies (VAFs) for SSMs (aka SNVs).
+
+2. parser/create_phylowgs_inputs.py: Takes CNVs (from parse_cnvs.py)
+and SSMs (from a VCF file), producing the input files PhyloWGS uses.
+This script is necessary because VCFs from different callers differ
+dramatically in how they represent read counts, which yield the VAFs
+that are used by our clustering algorithm. The parser also filters out
+undesirable variants (such as those lying in regions for which we have
+no copy number information, or which failed some of the variant
+caller's filters) and subsamples the number of variants clustered so
+that the algorithm's runtime is more reasonable.
+
+3. evolve.py: This is the primary component of PhyloWGS. It infers
+subclonal lineages based on the VAFs and CNVs it is given as input. In
+total, it will sample 2500 trees via MCMC, with each tree providing
+clusters of SSMs & CNVs, the structural relationships between those
+clusters (which is why it's a tree and not just a clustering),
+assignments of every SSM and CNV to a cluster, and the cellular
+prevalence of each cluster (i.e., what proportion of cells in the
+sample carry the SSMs/CNVs assigned to the cluster). These are written
+to disk as the file trees.zip, which contains each tree as a pickled
+instance of the TSSB class.
+
+4. write_results.py: Converts the sampled trees in trees.zip to JSON
+files that are more easily handled by downstream processing scripts.
+These can also be visualized by the web-based Witness system shipped
+in the source tree.
+
+5. posterior_trees.py: This will write the trees in trees.zip to LaTeX
+files, and run pdflatex to create PDFs from them. As part of this
+process, there's posterior merging done of the trees, in which trees
+that have identical clusters, tree structures, and assignment of SSMs
+& CNVs to clusters are merged together, averaging the cellular
+prevalences of each population. Unfortunately, when one is clustering
+5000 SSMs and several dozen CNVs, very few trees will have identical
+structures and assignments, meaning that the posterior merging does
+little to summarize the most common trends in the 2500 sampled trees.
+As such, we are moving toward a more robust clustering of trees that
+will give a much better understanding of what portions of the sampled
+phylogenies are consistent across trees, and what portions differ.

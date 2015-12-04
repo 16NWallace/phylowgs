@@ -7,8 +7,8 @@ class Datum(object):
 	def __init__(self, name, id, a, d, mu_r=0, mu_v=0):
 		self.name = name # SSM name, blank for CNV
 		self.id = id
-		self.a = a
-		self.d = d
+		self.a = a 	#number of reference reads (parser README)
+		self.d = d #number of total reads
 		self.mu_r = mu_r # 1-p_error
 		self.mu_v = mu_v
 		self._log_bin_norm_const = [u.log_bin_coeff(self.d[tp], self.a[tp]) for tp in arange(len(self.a))]
@@ -43,21 +43,30 @@ class Datum(object):
 	# for multiple samples
 	def _log_complete_likelihood(self, phi, mu_r, mu_v):
 		ntps = len(self.a)
-		return sum([self.__log_complete_likelihood__(phi, mu_r, mu_v,tp) for tp in arange(ntps)])
-	def __log_complete_likelihood__(self, phi, mu_r, mu_v, tp, new_state=0):	
+		sd_d = std(self.d)
+		return sum([self.__log_complete_likelihood__(phi, mu_r, mu_v,tp, sd_d=sd_d) for tp in arange(ntps)])
+	def __log_complete_likelihood__(self, phi, mu_r, mu_v, tp, new_state=0, sd_d=0):	
+
+		##Added: specify which method to use - binom or negbinom
+		model_distribution = u.log_binomial_likelihood2
+		if self.tssb.neg_binom:
+			model_distribution = u.log_neg_binom_likelihood
 		
 		if self.cnv:
 			ll = []
 			poss_n_genomes = self.compute_n_genomes(tp,new_state)
 			poss_n_genomes = [x for x in poss_n_genomes if x[1] > 0]
 			for (nr,nv) in poss_n_genomes:
+				#Update probability step, normalize
 				mu = (nr * mu_r + nv*(1-mu_r) ) / (nr+ nv)
-				ll.append(u.log_binomial_likelihood(self.a[tp], self.d[tp], mu) + log(1.0/len(poss_n_genomes)) +  self._log_bin_norm_const[tp])
+				##Modified to use either regular or negative binomial distribution
+				ll.append(model_distribution(self.a[tp], self.d[tp], mu, sd_d) + log(1.0/len(poss_n_genomes)) +  self._log_bin_norm_const[tp])
 			if len(poss_n_genomes) == 0:
 				ll.append(log(1e-99)) # to handle cases with zero likelihood
 			llh = u.logsumexp(ll)
 		else: ## CNV datum
 			mu = (1 - phi) * mu_r + phi*mu_v # (mu_r=0.999, mu_v=0.5)
+			#MODIFY THIS LINE TOO
 			llh = u.log_binomial_likelihood(self.a[tp], self.d[tp], mu) +  self._log_bin_norm_const[tp]
 		return 	llh
 	
@@ -96,6 +105,7 @@ class Datum(object):
 				print "PANIC"
 		
 		nodes = self.tssb.root['node'].tssb.get_nodes()
+		#reference vs variant
 		self.nr1 = 0
 		self.nv1 = 0
 		self.nr2 = 0 
