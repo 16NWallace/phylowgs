@@ -114,9 +114,9 @@ def readJSON(JSONFile):
 		return json.load(data_file)
 
 def main():
-	tree_summary = sys.argv[1]
-	# will have to change this to get all the trees from the summary file
-	tree = readJSON(tree_summary)
+	trees_summary = sys.argv[1]
+	# get the top tree from the JSON file 
+	tree = readJSON(tree_summary["trees"]["0"])
 	print max_ssms(tree)
 	print num_pop(tree)
 	print num_leaves(tree)
