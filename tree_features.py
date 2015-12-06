@@ -8,6 +8,7 @@ class Tree:
 		self.max_ssms = max_ssms(treeJSON)
 		self.max_cnvs = max_cnvs(treeJSON)
 		self.total_ssms = total_ssms(treeJSON)
+		self.total_cnvs = total_cnvs(treeJSON)
 		self.max_branching = max_branching(treeJSON)
 		self.num_pop = num_pop(treeJSON)
 		self.num_leaves = num_leaves(treeJSON)
@@ -41,6 +42,16 @@ def total_ssms(tree):
 		pop_ssms = populations[pop_idx]["num_ssms"]
 		total_ssms += pop_ssms
 	return total_ssms
+
+# finds the total number of CNVs in a tree
+def total_cnvs(tree):
+	populations = tree["populations"]
+	total_cnvs = 0
+	for pop_idx in populations:
+		pop_cnvs = populations[pop_idx]["num_cnvs"]
+		total_cnvs += pop_cnvs
+	return total_cnvs
+
 # finds the maximum number of SSMs among the populations in a tree
 def max_ssms(tree):
 	populations = tree["populations"]
@@ -76,13 +87,13 @@ def max_branching(tree):
 # determines the total number of populations (subclones) in a tree, discounting the dummy 0 population
 def num_pop(tree):
 	populations = tree["populations"]
-	return len(populations) - 1
+	return len(populations) 
 
 # determines the number of leaves (populations with no descendants) in a tree, discounting the dummy 0 node
 def num_leaves(tree):
 	tree_pop = num_pop(tree)
 	tree_structure = tree["structure"]
-	num_internal = len(tree_structure) - 1
+	num_internal = len(tree_structure)
 	return tree_pop - num_internal
 
 # # determines the height/depth of a tree, discounting the dummy 0 node
