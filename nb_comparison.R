@@ -1,5 +1,4 @@
-install.packages("plotrix")
-library("plotrix")
+require("plotrix")
 
 binom_path<-"~/Documents/Classes/Fall\ 2015/6.047/phylowgs/cpMatrix_binom2.csv"
 nb_path<-"~/Documents/Classes/Fall\ 2015/6.047/phylowgs/cpMatrix_negbinom2.csv"
@@ -63,3 +62,33 @@ rownames(mww_table)<-0:14
 #Row by row Chi-squared test - compare average cell prevalences per population
 conting_table<-cbind(binom_summ[,"Mean"], append(negbinom_summ[,"Mean"], na_pad))
 chi_sq_table<-chisq.test(conting_table[15,])
+
+#Computing error for number of expected populations
+
+#Load csvs per number of expected
+poplMatricesPath<-"~/Documents/Classes/Fall\ 2015/6.047/phylowgs/popl_matrices_2"
+poplMatrixFiles<-list.files(poplMatricesPath, pattern=".csv", full.names=TRUE)
+fileNames<-list.files(poplMatricesPath, pattern=".csv", full.names=FALSE)
+csvPopList<-lapply(poplMatrixFiles, read.csv, stringsAsFactors=FALSE, fill=TRUE, header=FALSE)
+names(csvPopList)<-c("binom3","binom4","binom5","binom6","nbinom3","nbinom4", "nbinom5", "nbinom6")
+#Table of inferred-actual
+makePopBarGraph<-function(idx){
+  binom<-paste("binom", idx, sep="")
+  nbinom<-paste("nbinom", idx, sep="")
+  popCounts<-rbind(table(as.numeric(csvPopList[[binom]][,1])),
+        table(as.numeric(csvPopList[[nbinom]][,1])))
+  barplot(popCounts, main=paste("Number of Subclone Populations - ",idx), 
+          col=c("red", "blue"), legend=rownames(popCounts), beside=TRUE)
+}
+makePopBarGraph(3)
+makePopBarGraph(4)
+makePopBarGraph(5)
+makePopBarGraph(6)
+
+
+
+
+
+
+
+
