@@ -18,10 +18,8 @@ def generateTreeList(trees_dict_path):
 	list_tree_obj = []
 	# trees_dict_path = sys.argv[1]
 	all_json = os.listdir(trees_dict_path)
-	print all_json
 	for tree_json_name in all_json:
 		path = trees_dict_path + "/" + tree_json_name
-		print path
 		tree_summary = readJSON(path)
 		all_trees = tree_summary["trees"]
 		top_10_trees = sort_trees(all_trees, 10)
@@ -79,7 +77,7 @@ def main():
 	feature = sys.argv[2]
 	name = sys.argv[3]
 	treeList = generateTreeList(dict_path)
-	featureMatrix = generateFeatureMatrix(treeList)
+	featureMatrix = generateFeatureMatrix(treeList, feature)
 	# generate csv file
 	csv = np.savetxt("matrix_"+feature+"_"+name+".csv", featureMatrix)
 

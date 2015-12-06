@@ -66,13 +66,13 @@ def max_branching(tree):
 # determines the total number of populations (subclones) in a tree, discounting the dummy 0 population
 def num_pop(tree):
 	populations = tree["populations"]
-	return len(populations) - 1
+	return len(populations)
 
 # determines the number of leaves (populations with no descendants) in a tree, discounting the dummy 0 node
 def num_leaves(tree):
 	tree_pop = num_pop(tree)
 	tree_structure = tree["structure"]
-	num_internal = len(tree_structure) - 1
+	num_internal = len(tree_structure)
 	return tree_pop - num_internal
 
 # determines the height/depth of a tree, discounting the dummy 0 node
