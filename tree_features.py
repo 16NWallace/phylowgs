@@ -16,7 +16,8 @@ class Tree:
 		self.avg_ssms = avg_ssms(treeJSON)
 		self.avg_cnvs = avg_cnvs(treeJSON)
 		self.avg_children = avg_children(treeJSON)
-	
+		self.cellular_prevalence = cell_prevalence(treeJSON)
+
 	def get_max_ssms():
 		return self.max_ssms
 	def get_max_cnvs():
@@ -51,6 +52,9 @@ def total_cnvs(tree):
 		pop_cnvs = populations[pop_idx]["num_cnvs"]
 		total_cnvs += pop_cnvs
 	return total_cnvs
+
+def get_cell_prev():
+	return self.cellular_prevalence
 
 # finds the maximum number of SSMs among the populations in a tree
 def max_ssms(tree):
@@ -136,4 +140,11 @@ def avg_children(tree):
 		total_children += len(structure[internal])
 	return float(total_children) / float(subclones)
 
+#Get cellular prevalence values for distribution
+def cell_prevalence(tree):
+	populations = tree["populations"]
+	pop_prev = {}
+	for pop_idx in populations.keys():
+		pop_prev[pop_idx] = populations[pop_idx]["cellular_prevalence"]
+	return pop_prev
 

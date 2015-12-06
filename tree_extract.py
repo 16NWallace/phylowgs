@@ -67,7 +67,6 @@ def main():
 	name = sys.argv[3]
 	treeList = generateTreeList(dict_path)
 	featureMatrix = generateFeatureMatrix(treeList, feature)
-	# generate csv file
 	csv = np.savetxt("matrix_"+feature+"_"+name+".csv", featureMatrix)
 
 main()
