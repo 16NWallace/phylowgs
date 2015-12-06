@@ -13,6 +13,7 @@ class Tree:
 		self.avg_ssms = avg_ssms(treeJSON)
 		self.avg_cnvs = avg_cnvs(treeJSON)
 		self.avg_children = avg_children(treeJSON)
+		self.cellular_prevalence = cell_prevalence(treeJSON)
 
 	def get_max_ssms():
 		return self.max_ssms
@@ -28,6 +29,8 @@ class Tree:
 		return self.avg_ssms
 	def get_avg_cnvs():
 		return self.avg_cnvs
+	def get_cell_prev():
+		return self.cellular_prevalence
 
 # finds the maximum number of SSMs among the populations in a tree
 def max_ssms(tree):
@@ -108,25 +111,12 @@ def avg_children(tree):
 		total_children += len(structure[internal])
 	return float(total_children) / float(subclones)
 
-# read a JSON file, returns the data from the file
-def readJSON(JSONFile):
-	with open(JSONFile) as data_file:
-		return json.load(data_file)
-
-def main():
-	tree_summary = sys.argv[1]
-	# will have to change this to get all the trees from the summary file
-	tree = readJSON(tree_summary)
-	print max_ssms(tree)
-	print num_pop(tree)
-	print num_leaves(tree)
-	print tree_height(tree)
-main()
-test_pop = {"0" : {"num_ssms" : 1, "num_cnvs":1, "cellular_prevalance":[1.0]}, "1" : {"num_ssms":2, "num_cnvs":2, "cellular_prevalance":[1.0]}, "2":{"num_ssms":2, "num_cnvs":2, "cellular_prevalance":[1.0] }}
-test_tree = {"populations" : test_pop, "structure" : {"0":[1,2]}}
-# print max_ssms(test_tree)
-# print num_pop(test_tree)
-# print num_leaves(test_tree)
-# print tree_height(test_tree)
+#Get cellular prevalence values for distribution
+def cell_prevalence(tree):
+	populations = tree["populations"]
+	pop_prev = {}
+	for pop_idx in populations.keys():
+		pop_prev[pop_idx] = populations[pop_idx]["cellular_prevalence"]
+	return pop_prev
 
 

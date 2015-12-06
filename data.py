@@ -8,7 +8,9 @@ class Datum(object):
 		self.name = name # SSM name, blank for CNV
 		self.id = id
 		self.a = a 	#number of reference reads (parser README)
+		#print "A: ", a
 		self.d = d #number of total reads
+		#print "D: ", d
 		self.mu_r = mu_r # 1-p_error
 		self.mu_v = mu_v
 		self._log_bin_norm_const = [u.log_bin_coeff(self.d[tp], self.a[tp]) for tp in arange(len(self.a))]
@@ -24,6 +26,7 @@ class Datum(object):
 	
 	# for multiple samples
 	def _log_likelihood(self, phi,update_tree=True,new_state=0):
+		#print 'In multiple samples log'
 		ntps = len(phi) # multi sample
 		return sum([self.__log_likelihood__(phi[tp],tp,update_tree,new_state) for tp in arange(ntps)])	
 	
@@ -44,13 +47,15 @@ class Datum(object):
 	def _log_complete_likelihood(self, phi, mu_r, mu_v):
 		ntps = len(self.a)
 		sd_d = std(self.d)
-		return sum([self.__log_complete_likelihood__(phi, mu_r, mu_v,tp, sd_d=sd_d) for tp in arange(ntps)])
-	def __log_complete_likelihood__(self, phi, mu_r, mu_v, tp, new_state=0, sd_d=0):	
-
+		return sum([self.__log_complete_likelihood__(phi, mu_r, mu_v,tp) for tp in arange(ntps)])
+	####MODIFIED TO ACCOUNT FOR NEGATIVE BINOMIAL BOOLEAN
+	def __log_complete_likelihood__(self, phi, mu_r, mu_v, tp, new_state=0):	
+		sd_d = std(self.d)
+		#print "STDEV: ", sd_d
 		##Added: specify which method to use - binom or negbinom
-		model_distribution = u.log_binomial_likelihood2
+		model_distribution = self.calcLogLikelihoodBinom
 		if self.tssb.neg_binom:
-			model_distribution = u.log_neg_binom_likelihood
+			model_distribution = self.calcLogLikelihoodNegBinom
 		
 		if self.cnv:
 			ll = []
@@ -60,16 +65,27 @@ class Datum(object):
 				#Update probability step, normalize
 				mu = (nr * mu_r + nv*(1-mu_r) ) / (nr+ nv)
 				##Modified to use either regular or negative binomial distribution
-				ll.append(model_distribution(self.a[tp], self.d[tp], mu, sd_d) + log(1.0/len(poss_n_genomes)) +  self._log_bin_norm_const[tp])
+				if not self.tssb.neg_binom:
+					ll.append(model_distribution(mu, tp, sd_d) + log(1.0/len(poss_n_genomes)))
+				else:
+					ll.append(model_distribution(mu, tp, sd_d))
 			if len(poss_n_genomes) == 0:
 				ll.append(log(1e-99)) # to handle cases with zero likelihood
 			llh = u.logsumexp(ll)
-		else: ## CNV datum
+		else: ## SSM datum
 			mu = (1 - phi) * mu_r + phi*mu_v # (mu_r=0.999, mu_v=0.5)
-			#MODIFY THIS LINE TOO
-			llh = u.log_binomial_likelihood(self.a[tp], self.d[tp], mu) +  self._log_bin_norm_const[tp]
+			llh = model_distribution(mu, tp)
 		return 	llh
 	
+	def calcLogLikelihoodBinom(self, mu, tp, sd_d=0):
+		return u.log_binomial_likelihood(self.a[tp], self.d[tp], mu) +  self._log_bin_norm_const[tp]
+
+	#The binomial model uses self.a as the number of successes in a binomial distribution. Since the
+	#negative binomial model counts the number of failures before a certain number of successes, we use
+	#d-a instead of a
+	def calcLogLikelihoodNegBinom(self, mu, tp, sd_d=0):
+		return u.log_neg_binom_likelihood(self.a[tp], self.d[tp]-self.a[tp], mu, sd_d)
+
 	# computes the binomial parameter
 	def compute_n_genomes(self,tp,new_state=0):
 	

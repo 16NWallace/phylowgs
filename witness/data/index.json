@@ -1,1 +1,1 @@
-{"test_results": [{"muts_path": "data/test_results/example_data.muts.json", "name": "example_data", "summary_path": "data/test_results/example_data.summ.json"}]}
+{"test_results_nb": [{"muts_path": "data/test_results_nb/nb_test_6_pops.muts.json", "name": "nb_test_6_pops", "summary_path": "data/test_results_nb/nb_test_6_pops.summ.json"}]}
