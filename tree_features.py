@@ -91,12 +91,13 @@ def max_branching(tree):
 # determines the total number of populations (subclones) in a tree, discounting the dummy 0 population
 def num_pop(tree):
 	populations = tree["populations"]
-	pop_count = 0
+	pop_count=0
 	for pop_idx in populations:
 		pop_ssms = populations[pop_idx]["num_ssms"]
+		#Remove populations with 0 SSMs as defined in paper (e.g. Ref. Pop. 0)
 		if pop_ssms == 0:
 			continue
-		pop_count += 1
+		pop_count+=1
 	return pop_count
 
 # determines the number of leaves (populations with no descendants) in a tree, discounting the dummy 0 node

@@ -16,11 +16,13 @@ def readJSON(JSONFile):
 def generateTreeList(trees_dict_path):
 	list_tree_obj = []
 	all_json = os.listdir(trees_dict_path)
+	print all_json
 	for tree_json_name in all_json:
 		path = trees_dict_path + "/" + tree_json_name
+		print path
 		tree_summary = readJSON(path)
 		all_trees = tree_summary["trees"]
-		top_10_trees = sort_trees(all_trees, 10)
+		top_10_trees = sort_trees(all_trees, len(all_trees))
 		for tree in top_10_trees:
 			tree_obj = Tree(tree)
 			list_tree_obj.append(tree_obj)
@@ -69,5 +71,8 @@ def main():
 	featureMatrix = generateFeatureMatrix(treeList, feature)
 	# generate csv file
 	csv = np.savetxt("matrix_"+feature+"_"+name+".csv", featureMatrix)
+<<<<<<< HEAD
 
 main()
+=======
+>>>>>>> de4e36e... [Neg binom] Analysis of inferred versus actual number of populations

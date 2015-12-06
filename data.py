@@ -50,8 +50,8 @@ class Datum(object):
 	####MODIFIED TO ACCOUNT FOR NEGATIVE BINOMIAL BOOLEAN
 	def __log_complete_likelihood__(self, phi, mu_r, mu_v, tp, new_state=0):	
 		sd_d = std(self.d)
-		#print "STDEV: ", sd_d
-		##Added: specify which method to use - binom or negbinom
+		
+		##Specify which method to use - binom or negbinom
 		model_distribution = self.calcLogLikelihoodBinom
 		if self.tssb.neg_binom:
 			model_distribution = self.calcLogLikelihoodNegBinom
@@ -62,11 +62,7 @@ class Datum(object):
 			poss_n_genomes = [x for x in poss_n_genomes if x[1] > 0]
 			for (nr,nv) in poss_n_genomes:
 				mu = (nr * mu_r + nv*(1-mu_r) ) / (nr+ nv)
-				##Modified to use either regular or negative binomial distribution
-				if not self.tssb.neg_binom:
-					ll.append(model_distribution(mu, tp, sd_d) + log(1.0/len(poss_n_genomes)))
-				else:
-					ll.append(model_distribution(mu, tp, sd_d))
+				ll.append(model_distribution(mu, tp, sd_d) + log(1.0/len(poss_n_genomes)))
 			if len(poss_n_genomes) == 0:
 				ll.append(log(1e-99)) # to handle cases with zero likelihood
 			llh = u.logsumexp(ll)

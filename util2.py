@@ -44,7 +44,6 @@ def log_binomial_likelihood2(x, n, mu, sd=0):
 #Maximum likelihood estimation of probability that mu is the parameter given k for a range of r variables,
 #allowing for more variability in the occurrence of SSMs in populations
 def log_neg_binom_likelihood(k, r, mu, sd=0):
-	#print sd
 	if sd==0:
 		offset = 0
 		diff = 1
@@ -55,7 +54,6 @@ def log_neg_binom_likelihood(k, r, mu, sd=0):
 		minR = int(r - offset)
 		maxR = int(r + offset)
 		diff = maxR-minR+1 #num iterations
-		#print diff
 	
 	mle=0
 	#Inclusive
