@@ -87,7 +87,13 @@ def max_branching(tree):
 # determines the total number of populations (subclones) in a tree, discounting the dummy 0 population
 def num_pop(tree):
 	populations = tree["populations"]
-	return len(populations) 
+	pop_count = 0
+	for pop_idx in populations:
+		pop_ssms = populations[pop_idx]["num_ssms"]
+		if pop_ssms == 0:
+			continue
+		pop_count += 1
+	return pop_count
 
 # determines the number of leaves (populations with no descendants) in a tree, discounting the dummy 0 node
 def num_leaves(tree):
@@ -107,7 +113,7 @@ def avg_ssms(tree):
 	for pop_idx in populations:
 		pop_ssms = populations[pop_idx]["num_ssms"]
 		sum_ssms += pop_ssms
-	return float(sum_ssms) / len(populations)
+	return float(sum_ssms) / num_pop(tree)
 
 # determines the average number of CNVs in a set of populations of a tree
 def avg_cnvs(tree):
@@ -116,7 +122,7 @@ def avg_cnvs(tree):
 	for pop_idx in populations:
 		pop_cnvs = populations[pop_idx]["num_cnvs"]
 		sum_cnvs += pop_cnvs
-	return float(sum_cnvs) / len(populations)
+	return float(sum_cnvs) / num_pop(tree)
 
 # determines the average number of children of subclones in a tree, meant as a measure of branching
 def avg_children(tree):
@@ -129,6 +135,5 @@ def avg_children(tree):
 			continue
 		total_children += len(structure[internal])
 	return float(total_children) / float(subclones)
-
 
 

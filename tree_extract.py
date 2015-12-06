@@ -17,22 +17,14 @@ def generateTreeList(trees_dict_path):
 	list_tree_obj = []
 	# trees_dict_path = sys.argv[1]
 	all_json = os.listdir(trees_dict_path)
-	print all_json
 	for tree_json_name in all_json:
 		path = trees_dict_path + "/" + tree_json_name
-		print path
 		tree_summary = readJSON(path)
 		all_trees = tree_summary["trees"]
 		top_10_trees = sort_trees(all_trees, 10)
 		for tree in top_10_trees:
 			tree_obj = Tree(tree)
 			list_tree_obj.append(tree_obj)
-		# for tree_idx in all_trees:
-		# 	tree_obj = Tree(all_trees[tree_idx])
-		# 	list_tree_obj.append(tree_obj)
-		# top_tree = tree_summary["trees"]["0"]
-		# top_tree_obj = Tree(top_tree)
-		# list_tree_obj.append(top_tree_obj)
 	return list_tree_obj
 
 # sort the trees according to log likelihood, return a list of the top k trees
@@ -45,7 +37,7 @@ def sort_trees(trees, k):
 		tree_llh = tree["llh"]
 		llh_array.append(tree_llh)
 		tree_track_dict[tree_llh] = tree_idx
-	sorted_llh_array = sorted(llh_array)
+	sorted_llh_array = sorted(llh_array, reverse=True)
 	top_k_llh = sorted_llh_array[:k]
 	for llh in top_k_llh:
 		top_tree_idx = tree_track_dict[llh]
