@@ -69,6 +69,7 @@ def num_pop(tree):
 	pop_count=0
 	for pop_idx in populations:
 		pop_ssms = populations[pop_idx]["num_ssms"]
+		#Remove populations with 0 SSMs as defined in paper (e.g. Ref. Pop. 0)
 		if pop_ssms == 0:
 			continue
 		pop_count+=1
@@ -124,5 +125,4 @@ def cell_prevalence(tree):
 	for pop_idx in populations.keys():
 		pop_prev[pop_idx] = populations[pop_idx]["cellular_prevalence"]
 	return pop_prev
-
 

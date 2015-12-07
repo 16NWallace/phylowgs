@@ -18,20 +18,16 @@ def generateTreeList(trees_dict_path):
 	list_tree_obj = []
 	# trees_dict_path = sys.argv[1]
 	all_json = os.listdir(trees_dict_path)
+	print all_json
 	for tree_json_name in all_json:
 		path = trees_dict_path + "/" + tree_json_name
+		print path
 		tree_summary = readJSON(path)
 		all_trees = tree_summary["trees"]
-		top_10_trees = sort_trees(all_trees, 10)
+		top_10_trees = sort_trees(all_trees, len(all_trees))
 		for tree in top_10_trees:
 			tree_obj = Tree(tree)
 			list_tree_obj.append(tree_obj)
-		# for tree_idx in all_trees:
-		# 	tree_obj = Tree(all_trees[tree_idx])
-		# 	list_tree_obj.append(tree_obj)
-		# top_tree = tree_summary["trees"]["0"]
-		# top_tree_obj = Tree(top_tree)
-		# list_tree_obj.append(top_tree_obj)
 	return list_tree_obj
 
 # sort the trees according to log likelihood, return a list of the top k trees
@@ -51,9 +47,6 @@ def sort_trees(trees, k):
 		top_tree = trees[top_tree_idx]
 		trees_return.append(top_tree)
 	return trees_return
-
-
-
 
 # generates a feature matrix for k-means clustering based on a list of Tree objects, using the specified feature. the matrix 
 def generateFeatureMatrix(tree_list, feature):
@@ -80,7 +73,3 @@ def main():
 	featureMatrix = generateFeatureMatrix(treeList, feature)
 	# generate csv file
 	csv = np.savetxt("matrix_"+feature+"_"+name+".csv", featureMatrix)
-
-main()
-test_pop = {"0" : {"num_ssms" : 1, "num_cnvs":1, "cellular_prevalance":[1.0]}, "1" : {"num_ssms":2, "num_cnvs":2, "cellular_prevalance":[1.0]}, "2":{"num_ssms":2, "num_cnvs":2, "cellular_prevalance":[1.0] }}
-test_tree = {"populations" : test_pop, "structure" : {"0":[1,2]}}
