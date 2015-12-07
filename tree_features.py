@@ -12,7 +12,7 @@ class Tree:
 		self.max_branching = max_branching(treeJSON)
 		self.num_pop = num_pop(treeJSON)
 		self.num_leaves = num_leaves(treeJSON)
-		# self.tree_height = tree_height(treeJSON)
+		self.num_internal = num_internal(treeJSON)
 		self.avg_ssms = avg_ssms(treeJSON)
 		self.avg_cnvs = avg_cnvs(treeJSON)
 		self.avg_children = avg_children(treeJSON)
@@ -25,8 +25,8 @@ class Tree:
 		return self.num_pop
 	def get_num_leaves():
 		return self.num_leaves
-	# def get_tree_height():
-	# 	return self.tree_height
+	def get_num_internal():
+		return self.num_internal
 	def get_avg_ssms():
 		return self.avg_ssms
 	def get_avg_cnvs():
@@ -102,9 +102,9 @@ def num_leaves(tree):
 	num_internal = len(tree_structure)
 	return tree_pop - num_internal
 
-# # determines the height/depth of a tree, discounting the dummy 0 node
-# def tree_height(tree):
-
+# determines the number of internal nodes
+def num_internal(tree):
+	return len(tree_structure)
 
 # determines the average number of SSMs in populations of a tree
 def avg_ssms(tree):

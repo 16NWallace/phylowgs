@@ -21,7 +21,7 @@ avg_cnvs_data$ssms <- avg_ssms_data[,1]
 avg_ssms_cnvs_kmeans <- kmeans(avg_cnvs_data, 6, iter.max = 100)
 avg_ssms_cnvs_plot <- plot(avg_cnvs_data[,2], avg_cnvs_data[,1], xlab="Average number of SSMs/population", ylab="Average number of CNVs/population", col=avg_ssms_cnvs_kmeans$cluster)
 
-max_branching_data_init <- read.table("/Users/avasoleimany/phylowgs/matrix_num_leaves_depth_300_v2.csv", header=FALSE, stringsAsFactors = FALSE)
+max_branching_data_init <- read.table("/Users/avasoleimany/phylowgs/matrix_max_branching_depth_300_v2.csv", header=FALSE, stringsAsFactors = FALSE)
 max_branching_data_init$size <- 0
 max_branching <- kmeans(max_branching_data_init[,1], 2, iter.max = 100)
 max_branching_plot <- plot(max_branching_data_init[,1], max_branching_data_init[,2], xlab="Maximum Branching", yaxt="n", ylab="", col=max_branching$cluster)

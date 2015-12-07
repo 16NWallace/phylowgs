@@ -15,7 +15,6 @@ def readJSON(JSONFile):
 # generate a list of Tree objects based on the tree summary files in the trees_dict_path dictionary
 def generateTreeList(trees_dict_path):
 	list_tree_obj = []
-	# trees_dict_path = sys.argv[1]
 	all_json = os.listdir(trees_dict_path)
 	for tree_json_name in all_json:
 		path = trees_dict_path + "/" + tree_json_name
@@ -72,5 +71,3 @@ def main():
 	csv = np.savetxt("matrix_"+feature+"_"+name+".csv", featureMatrix)
 
 main()
-test_pop = {"0" : {"num_ssms" : 1, "num_cnvs":1, "cellular_prevalance":[1.0]}, "1" : {"num_ssms":2, "num_cnvs":2, "cellular_prevalance":[1.0]}, "2":{"num_ssms":2, "num_cnvs":2, "cellular_prevalance":[1.0] }}
-test_tree = {"populations" : test_pop, "structure" : {"0":[1,2]}}
