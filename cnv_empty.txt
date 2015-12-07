@@ -1,0 +1,5 @@
+<<<<<<< HEAD
+cnv	a	d	ssms
+=======
+cnv	a	d	ssms
+>>>>>>> 57055bd... [Neg Binom] Full implementation of neg binom, results and CSV matrices generated for simulated data

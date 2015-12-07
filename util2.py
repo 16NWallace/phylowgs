@@ -5,7 +5,7 @@ import zipfile
 import shutil
 
 import scipy.stats as stat
-from scipy.stats import beta, binom
+from scipy.stats import beta, binom, nbinom
 from scipy.special import gammaln
 from math import exp, log
 
@@ -19,6 +19,9 @@ csv.field_size_limit(2147483647)
 from data import Datum
 
 from tssb import *
+#Percent of standard dev in which to test r values
+NB_FRAC = 0.0005 #determined based on average standard dev's seen in ssm_data.txt on order of 10^2
+NB_INCR = 5 #test range [d-NB_FRAC*sd:d+NB_FRAC*SD:NB_INCR], can change as necessary
 
 def log_factorial(n):
 	return gammaln(n + 1)
@@ -26,9 +29,48 @@ def log_factorial(n):
 def log_bin_coeff(n, k):
 	return log_factorial(n) - log_factorial(k) - log_factorial(n - k)
 
+#x=a, number of reference allele reads, n=d, total number of reads
 def log_binomial_likelihood(x, n, mu):
 	return x * log(mu) + (n - x) * log(1 - mu)
 
+##NEW FUNCTIONS
+#Signature added to handle optional stdev param for neg binom
+def log_binomial_likelihood2(x, n, mu, sd=0):
+	return x * log(mu) + (n - x) * log(1 - mu)
+
+#Allowing for greater variability using a negative binomial model - compute the average log likelihood
+#over r's greater than or less than d, the total number of reads for a certain range
+#k is the number of failures
+#Maximum likelihood estimation of probability that mu is the parameter given k for a range of r variables,
+#allowing for more variability in the occurrence of SSMs in populations
+def log_neg_binom_likelihood(k, r, mu, sd=0):
+	if sd==0:
+		offset = 0
+		diff = 1
+		minR = r
+		maxR = r
+	else: 
+		offset = NB_FRAC*sd
+		minR = int(r - offset)
+		maxR = int(r + offset)
+		diff = maxR-minR+1 #num iterations
+	
+	mle=0
+	#Inclusive
+	for r_val in xrange(minR, maxR+1, NB_INCR):
+		#likelihood that r_val, mu are true parameters given that you have seen k
+		newVal = llh_neg_binom(k, r_val, mu)
+		#probability of seeing k given r,p - assuming the prior is a negative binomial with 
+		#r and mu as true values in this case
+		weight = nbinom.pmf(k, r, mu)
+		mle += newVal+weight
+	return mle
+
+#mu is fraction of expected reference allele, k=num successes, r=num failures
+def llh_neg_binom(k,r,mu):
+	return gammaln(r+k) + k*log(mu) + r*log(1-mu) - (gammaln(r) + gammaln(k+1))
+
+####
 def log_beta(a, b):
 	return gammaln(a) + gammaln(b) - gammaln(a + b)
 
